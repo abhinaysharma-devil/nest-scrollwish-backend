@@ -1,7 +1,8 @@
-# Use lightweight Node image
-FROM node:20-alpine
+# ============================
+# Stage 1: Build Nest App
+# ============================
+FROM node:20-alpine AS builder
 
-# App directory
 WORKDIR /app
 
 # Copy package files
@@ -13,11 +14,28 @@ RUN npm install
 # Copy source code
 COPY . .
 
-# Build NestJS project
+# Build NestJS
 RUN npm run build
 
-# Cloud Run uses port 8080
+
+# ============================
+# Stage 2: Production Image
+# ============================
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copy only required files
+COPY package*.json ./
+
+# Install only production dependencies
+RUN npm install --only=production
+
+# Copy built output from builder stage
+COPY --from=builder /app/dist ./dist
+
+# Cloud Run port
 EXPOSE 8080
 
-# Start NestJS app
+# Start app
 CMD ["node", "dist/main"]
