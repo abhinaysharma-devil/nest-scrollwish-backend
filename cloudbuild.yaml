@@ -1,23 +1,26 @@
+options:
+  logging: CLOUD_LOGGING_ONLY
+
 steps:
-  # ✅ Step 1: Build Docker image
+  # 1. Build Docker image
   - name: "gcr.io/cloud-builders/docker"
     args:
       [
         "build",
         "-t",
-        "asia-south1-docker.pkg.dev/$PROJECT_ID/nest-repo/nest-app:latest",
+        "asia-south1-docker.pkg.dev/$PROJECT_ID/nest-repo/nest-app:$SHORT_SHA",
         "."
       ]
 
-  # ✅ Step 2: Push image to Artifact Registry
+  # 2. Push image
   - name: "gcr.io/cloud-builders/docker"
     args:
       [
         "push",
-        "asia-south1-docker.pkg.dev/$PROJECT_ID/nest-repo/nest-app:latest"
+        "asia-south1-docker.pkg.dev/$PROJECT_ID/nest-repo/nest-app:$SHORT_SHA"
       ]
 
-  # ✅ Step 3: Deploy to Cloud Run
+  # 3. Deploy to Cloud Run
   - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
     entrypoint: gcloud
     args:
@@ -26,7 +29,7 @@ steps:
         "deploy",
         "nest-app",
         "--image",
-        "asia-south1-docker.pkg.dev/$PROJECT_ID/nest-repo/nest-app:latest",
+        "asia-south1-docker.pkg.dev/$PROJECT_ID/nest-repo/nest-app:$SHORT_SHA",
         "--region",
         "asia-south1",
         "--platform",
@@ -35,4 +38,4 @@ steps:
       ]
 
 images:
-  - "asia-south1-docker.pkg.dev/$PROJECT_ID/nest-repo/nest-app:latest"
+  - "asia-south1-docker.pkg.dev/$PROJECT_ID/nest-repo/nest-app:$SHORT_SHA"
