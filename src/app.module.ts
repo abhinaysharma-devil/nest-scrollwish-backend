@@ -13,6 +13,7 @@ import { ConfigModule } from '@nestjs/config/dist/config.module';
     // ✅ Load .env globally
     ConfigModule.forRoot({
       isGlobal: true,
+      ignoreEnvVars: false,
     }),
 
     MongooseModule.forRoot(process.env.MONGO_URI || 'mongodb://localhost/nest'),
