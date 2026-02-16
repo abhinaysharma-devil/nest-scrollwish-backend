@@ -34,8 +34,11 @@ steps:
         "asia-south1",
         "--platform",
         "managed",
-        "--allow-unauthenticated"
+        "--allow-unauthenticated",
+        "--timeout",
+        "300"
       ]
+
 
 images:
   - "asia-south1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/nest-app:$SHORT_SHA"

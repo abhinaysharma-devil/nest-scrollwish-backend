@@ -1,41 +1,33 @@
 # ============================
-# Stage 1: Build Nest App
+# Stage 1: Build
 # ============================
 FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Copy package files
 COPY package*.json ./
-
-# Install dependencies
 RUN npm install
 
-# Copy source code
 COPY . .
-
-# Build NestJS
 RUN npm run build
 
 
 # ============================
-# Stage 2: Production Image
+# Stage 2: Production Runtime
 # ============================
 FROM node:20-alpine
 
 WORKDIR /app
 
-# Copy only required files
-COPY package*.json ./
+# Copy dependencies from builder
+COPY --from=builder /app/node_modules ./node_modules
 
-# Install only production dependencies
-RUN npm install --only=production
-
-# Copy built output from builder stage
+# Copy dist output
 COPY --from=builder /app/dist ./dist
 
-# Cloud Run port
+# Copy package.json (optional)
+COPY package*.json ./
+
 EXPOSE 8080
 
-# Start app
-CMD ["node", "dist/main"]
+CMD ["node", "dist/main.js"]
